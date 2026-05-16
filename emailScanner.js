@@ -111,10 +111,10 @@ function processDailyEmails() {
             msg += "*" + (k + 1) + ".* " + txTypeIcon + " " + txType + "\n";
             msg += "   📅 " + tx.transactionTime + "\n";
             if (tx.emailType === "credit_card_tx" || tx.bankType === "MSB") {
-                msg += "   🏪 " + tx.content + "\n";
+                msg += "   🏪 " + escapeMarkdown(tx.content) + "\n";
             }
             if (tx.transferContent) {
-                msg += "   📋 " + tx.transferContent + "\n";
+                msg += "   📋 " + escapeMarkdown(tx.transferContent) + "\n";
             }
             msg += "   💵 " + txFormattedAmount + "\n";
             msg += "   💳 " + txCardName + "\n\n";
@@ -173,10 +173,10 @@ function scanEmailStream(streamName, filters, parserFn, startOfDay, resultArray,
                 var emailId = msg.getId();
 
                 // Bỏ qua email trước mốc đầu ngày
-                if (msg.getDate() < startOfDay) {
-                    Logger.log("⏭️ [" + streamName + "] Bỏ qua email cũ: " + emailId);
-                    continue;
-                }
+                // if (msg.getDate() < startOfDay) {
+                //     Logger.log("⏭️ [" + streamName + "] Bỏ qua email cũ: " + emailId);
+                //     continue;
+                // }
 
                 // Kiểm tra đã xử lý: dùng in-memory idSet nếu có, fallback sang PropertiesService
                 var alreadyProcessed = processedIdSet

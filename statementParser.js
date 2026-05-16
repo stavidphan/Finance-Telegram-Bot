@@ -219,9 +219,8 @@ function parseUOBStatement(rawBody, cardKey) {
         });
     }
 
-    // Hạn thanh toán: "vao ngay DD/MM/YY" hoặc "DD/MM/YYYY"
-    // \s+ thay dấu cách đơn để xử lý line wrap ("vao\nngay DD/MM/YY")
-    var dueDateMatch = rawBody.match(/vao\s+ngay\s+(\d{2}\/\d{2}\/\d{2,4})/i);
+    // Hạn thanh toán: lấy ngày định dạng DD/MM/YY hoặc DD/MM/YYYY xuất hiện đầu tiên
+    var dueDateMatch = rawBody.match(/(\d{2}\/\d{2}\/\d{2,4})/);
     var dueDate = null;
     if (dueDateMatch) {
         var raw = dueDateMatch[1];
@@ -229,12 +228,12 @@ function parseUOBStatement(rawBody, cardKey) {
         dueDate = raw.match(/\d{4}$/) ? raw : raw.replace(/(\d{2})$/, "20$1");
     }
 
-    // Thanh toán tối thiểu: "VND 50,000"
-    var minDueMatch = rawBody.match(/toi thieu la VND\s+([\d,]+)/i);
+    // Thanh toán tối thiểu: quét giá trị số đứng sau từ "toi thieu" và "VND"
+    var minDueMatch = rawBody.match(/toi thieu.*?(?:la)?\s*VND\s+([\d,]+)/i);
     var minimumDue = minDueMatch ? parseFloat(minDueMatch[1].replace(/,/g, "")) : 0;
 
-    // Tổng dư nợ: "Tong thanh toan den han la VND 90,038"
-    var balanceMatch = rawBody.match(/Tong thanh toan den han la VND\s+([\d,]+)/i);
+    // Tổng dư nợ: quét giá trị số đứng sau "Tong" (hoặc "den han") và "VND"
+    var balanceMatch = rawBody.match(/(?:Tong|den han).*?(?:la)?\s*VND\s+([\d,]+)/i);
     var outstandingBalance = balanceMatch ? parseFloat(balanceMatch[1].replace(/,/g, "")) : null;
 
     Logger.log("✅ [StatementParser] UOB → key: " + cardKey +

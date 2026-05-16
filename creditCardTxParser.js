@@ -216,25 +216,27 @@ function parseVPBankCreditCardTx(rawBody, cleanBody, last4) {
 // ============================================================
 // UOB Credit Card Transaction Parser
 // ============================================================
-// Body format (kh\u00f4ng d\u1ea5u):
+// Body format (không dấu):
 //   "voi so cuoi 1403 da thuc hien giao dich 90,038 VND vao ngay 14/03/2026"
-// L\u01b0u \u00fd: kh\u00f4ng c\u00f3 gi\u1edd trong email \u2192 d\u00f9ng 00:00 l\u00e0m fallback.
 // ============================================================
 function parseUOBCreditCardTx(rawBody, cleanBody, last4) {
-    // S\u1ed1 ti\u1ec1n v\u00e0 ng\u00e0y: "giao dich X,XXX VND vao ngay DD/MM/YYYY"
-    var txMatch = rawBody.match(/giao dich\s+([\d,]+)\s*VND\s+vao\s+ngay\s+(\d{2}\/\d{2}\/\d{4})/i);
-    var amountRaw = txMatch ? "-" + txMatch[1] : null;      // Chi ti\u00eau \u2192 \u00e2m
-    var dateStr   = txMatch ? txMatch[2] : null;
+    // Số tiền: quét giá trị trước chữ VND (không phụ thuộc vào chuỗi "giao dich")
+    var amtMatch = rawBody.match(/([\d,]+)\s*VND/i);
+    var amountRaw = amtMatch ? "-" + amtMatch[1] : null;      // Chi tiêu → âm
 
-    // N\u1ed9i dung: kh\u00f4ng c\u00f3 t\u00ean merchant trong body \u2192 d\u00f9ng m\u00f4 t\u1ea3 chung
-    var content = "Giao d\u1ecbch UOB";
+    // Ngày giao dịch: lấy cụm định dạng DD/MM/YYYY đầu tiên
+    var dateMatch = rawBody.match(/(\d{2}\/\d{2}\/\d{4})/);
+    var dateStr = dateMatch ? dateMatch[1] : null;
+
+    // Nội dung: không có tên merchant trong body → dùng mô tả chung
+    var content = "Giao dịch UOB";
 
     var transactionTime = dateStr ? dateStr + " 00:00" : null;
 
-    Logger.log("\u2705 [CreditCardTxParser] UOB \u2192 last4: " + last4 + ", amount: " + amountRaw + ", time: " + transactionTime);
+    Logger.log("✅ [CreditCardTxParser] UOB → last4: " + last4 + ", amount: " + amountRaw + ", time: " + transactionTime);
 
     if (!amountRaw || !transactionTime) {
-        Logger.log("\u26a0\ufe0f [CreditCardTxParser] Thi\u1ebfu d\u1eef li\u1ec7u UOB.");
+        Logger.log("⚠️ [CreditCardTxParser] Thiếu dữ liệu UOB.");
         return null;
     }
 

@@ -96,14 +96,14 @@ var BANK_CONFIG = {
                 name: "MSB MDIGI 0487",
                 bank: "MSB",
                 parser: "parseMSBStatement",
-                sender: "banking_notify@msb.com.vn",
+                sender: "cardservicedesk@services.msb.com.vn",
                 subjectKeyword: "sao kê"
             },
             "0204": {
                 name: "MSB VISA ONLINE 0204",
                 bank: "MSB",
                 parser: "parseMSBStatement",
-                sender: "banking_notify@msb.com.vn",
+                sender: "cardservicedesk@services.msb.com.vn",
                 subjectKeyword: "sao kê"
             },
             // ── VPBank: key = định danh nội bộ (body không có số thẻ) ──

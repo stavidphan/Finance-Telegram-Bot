@@ -1939,10 +1939,10 @@ function correctType(newType) {
     var message = `*✅ Đã sửa định dạng giao dịch*\n\n` +
       `*${typeIcon} ${newType}*\n` +
       `*💰 Số tiền:* ${formattedAmount}\n` +
-      `*📝 Mô tả:* ${description}\n` +
-      `*${categoryIcon} Danh mục:* ${categoryDetail}\n` +
+      `*📝 Mô tả:* ${escapeMarkdown(description)}\n` +
+      `*${categoryIcon} Danh mục:* ${escapeMarkdown(categoryDetail)}\n` +
       `*📅 Ngày:* ${lastTransactionDate}\n`;
-    if (note) message += `*📌 Ghi chú:* ${note}\n`;
+    if (note) message += `*📌 Ghi chú:* ${escapeMarkdown(note)}\n`;
     message += `\n*📊 Tổng kết tháng ${month}:*\n` +
       `💰 Thu nhập: ${totalIncome.toLocaleString('vi-VN')} ₫\n` +
       `💸 Chi tiêu: ${totalExpense.toLocaleString('vi-VN')} ₫\n`;
@@ -2147,8 +2147,8 @@ function correctContent(newContent) {
     var markdownMessage = "*✅ Đã sửa nội dung giao dịch*\n\n" +
       "*" + typeIcon + " " + newType + "*\n" +
       "*💰 Số tiền:* " + formattedAmount + "\n" +
-      "*📝 Mô tả:* " + description + "\n" +
-      "*" + categoryIcon + " Danh mục:* " + categoryDetail + "\n" +
+      "*📝 Mô tả:* " + escapeMarkdown(description) + "\n" +
+      "*" + categoryIcon + " Danh mục:* " + escapeMarkdown(categoryDetail) + "\n" +
       "*📅 Ngày:* " + specifiedDate + "\n";
     if (escapedNote) markdownMessage += "*📌 Ghi chú:* " + escapedNote + "\n";
     markdownMessage += "\n*📊 Tổng kết tháng " + monthNum + ":*\n" +
@@ -2686,6 +2686,32 @@ function renameSheetColumns() {
   }
 }
 
+// ✅ Ghi log lỗi vào Google Sheet
+function logErrorToSheet(errorType, errorMessage, functionName, details) {
+  try {
+    var ss = SpreadsheetApp.openById(SHEET_ID);
+    var sheetName = "System Logs";
+    var sheet = ss.getSheetByName(sheetName);
+    
+    // Tạo sheet nếu chưa có
+    if (!sheet) {
+      sheet = ss.insertSheet(sheetName);
+      sheet.appendRow(["Thời gian", "Loại lỗi", "Hàm xảy ra lỗi", "Thông báo lỗi", "Chi tiết/Payload"]);
+      sheet.getRange("A1:E1").setFontWeight("bold").setBackground("#f3f3f3");
+      sheet.setColumnWidth(1, 150); // Thời gian
+      sheet.setColumnWidth(2, 150); // Loại lỗi
+      sheet.setColumnWidth(3, 150); // Hàm
+      sheet.setColumnWidth(4, 300); // Lỗi
+      sheet.setColumnWidth(5, 400); // Chi tiết
+    }
+    
+    var timestamp = Utilities.formatDate(new Date(), "GMT+7", "dd/MM/yyyy HH:mm:ss");
+    sheet.appendRow([timestamp, errorType, functionName, errorMessage, typeof details === 'string' ? details : JSON.stringify(details)]);
+  } catch (e) {
+    Logger.log("❌ Lỗi khi ghi log vào sheet: " + e.message);
+  }
+}
+
 // ✅ Gửi tin nhắn Telegram
 function sendMessage(text, options = { parse_mode: null }) {
   var url = "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/sendMessage";
@@ -2696,12 +2722,38 @@ function sendMessage(text, options = { parse_mode: null }) {
   var requestOptions = {
     "method": "post",
     "contentType": "application/json",
-    "payload": JSON.stringify(payload)
+    "payload": JSON.stringify(payload),
+    "muteHttpExceptions": true
   };
   try {
-    var response = UrlFetchApp.fetch(url, requestOptions); // Lưu response để debug
-    Logger.log("*✅ Gửi tin nhắn thành công. Response:* " + response.getContentText());
+    var response = UrlFetchApp.fetch(url, requestOptions);
+    var responseCode = response.getResponseCode();
+    var responseText = response.getContentText();
+    
+    if (responseCode !== 200) {
+      Logger.log("*❌ Lỗi sendMessage HTTP " + responseCode + ":* " + responseText + " | Payload: " + JSON.stringify(payload));
+      logErrorToSheet("Telegram API Error", responseText, "sendMessage", JSON.stringify(payload));
+      
+      // Thử gửi lại dạng raw text nếu lỗi liên quan tới parse_mode (chứa từ parse, entities, markdown)
+      if (options.parse_mode && (responseText.includes("parse") || responseText.includes("entities") || responseText.includes("Bad Request"))) {
+        var fallbackPayload = { 
+          "chat_id": TELEGRAM_CHAT_ID, 
+          "text": "❌❌❌ *Có lỗi định dạng tin nhắn.* ❌❌❌",
+          "parse_mode": "Markdown"
+        };
+        var fallbackOptions = {
+          "method": "post",
+          "contentType": "application/json",
+          "payload": JSON.stringify(fallbackPayload),
+          "muteHttpExceptions": true
+        };
+        UrlFetchApp.fetch(url, fallbackOptions);
+      }
+    } else {
+      Logger.log("*✅ Gửi tin nhắn thành công. Response:* " + responseText);
+    }
   } catch (e) {
-    Logger.log("*❌ Lỗi sendMessage:* " + e.message + " | Payload: " + JSON.stringify(payload));
+    Logger.log("*❌ Lỗi Network sendMessage:* " + e.message + " | Payload: " + JSON.stringify(payload));
+    logErrorToSheet("Network Error", e.message, "sendMessage", JSON.stringify(payload));
   }
 }

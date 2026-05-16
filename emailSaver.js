@@ -296,11 +296,11 @@ function confirmAndSaveEmailTransactions(bulkNote) {
 
             resultMsg += "*" + (j + 1) + ". " + typeIcon2 + " " + type2 + "*\n";
             resultMsg += "   *💰 Số tiền:* " + amount2.toLocaleString("vi-VN") + " VND\n";
-            resultMsg += "   *📝 Mô tả:* " + contentDisplay + "\n";
-            resultMsg += "   *" + categoryIcon2 + " Danh mục:* " + category2 + "\n";
+            resultMsg += "   *📝 Mô tả:* " + escapeMarkdown(contentDisplay) + "\n";
+            resultMsg += "   *" + categoryIcon2 + " Danh mục:* " + escapeMarkdown(category2) + "\n";
             resultMsg += "   *📅 Ngày:* " + dateDisplay2 + "\n";
             if (noteDisplay) {
-                resultMsg += "   *📌 Ghi chú:* " + noteDisplay.replace(/\*/g, "\\*") + "\n\n";
+                resultMsg += "   *📌 Ghi chú:* " + escapeMarkdown(noteDisplay) + "\n\n";
             } else {
                 resultMsg += "\n";
             }
