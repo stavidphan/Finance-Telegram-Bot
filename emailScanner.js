@@ -35,9 +35,10 @@ function processDailyEmails() {
         var processedData = loadProcessedEmailSet();
         var newProcessedIds = []; // Gom tất cả IDs mới → ghi 1 lần cuối
 
-        // Thu thập kết quả từ 3 luồng
+        // Thu thập kết quả từ 4 luồng
         var statements = [];
         var transactions = [];
+        var cashbacks = [];
 
         // ── Luồng 1: Giao dịch thẻ tín dụng ──
         scanEmailStream(
@@ -72,6 +73,17 @@ function processDailyEmails() {
             newProcessedIds
         );
 
+        // ── Luồng 4: Sao kê hoàn tiền (Cashback) ──
+        scanEmailStream(
+            "cashback",
+            getStreamFilters("cashback"),
+            parseCashbackEmail,
+            startOfDayGmt7,
+            cashbacks,
+            processedData.idSet,
+            newProcessedIds
+        );
+
         // Ghi tất cả IDs mới vào PropertiesService 1 lần (thay vì N lần)
         batchMarkEmailsProcessed(newProcessedIds, processedData.records);
 
@@ -80,6 +92,11 @@ function processDailyEmails() {
         // ── XỬ LÝ SAO KÊ TRƯỚC ──
         if (statements.length > 0) {
             processStatements(statements);
+        }
+
+        // ── XỬ LÝ HOÀN TIỀN (CASHBACK) ──
+        if (cashbacks.length > 0) {
+            processCashbacks(cashbacks);
         }
 
         // ── XỬ LÝ GIAO DỊCH SAU ──

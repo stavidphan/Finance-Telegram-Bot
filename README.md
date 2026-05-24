@@ -17,14 +17,15 @@ Nhập trực tiếp qua Telegram:
 **Format số tiền**: `50k` = 50,000 | `1.5m` = 1,500,000 | `1m5` = 1,500,000
 
 ### 📧 Quét email ngân hàng tự động
-- **3 loại email được quét**: giao dịch thẻ tín dụng, chuyển khoản ngân hàng, sao kê thẻ
+- **4 loại email được quét**: giao dịch thẻ tín dụng, chuyển khoản ngân hàng, sao kê thẻ, sao kê hoàn tiền
 - **Ngân hàng đã hỗ trợ**: MSB, VCB, VPBank, UOB, HSBC, CAKE
 - Quét tự động hàng ngày hoặc thủ công qua `/scanmail`
 - Sau khi quét, bot gửi danh sách giao dịch → bạn reply ghi chú cho từng giao dịch
 
-### 💳 Sao kê thẻ tín dụng
-- Tự động trích xuất dư nợ, hạn thanh toán
-- Lưu vào Google Sheet
+### 💳 Sao kê thẻ & Hoàn tiền
+- Tự động trích xuất dư nợ, hạn thanh toán từ sao kê
+- Tự động trích xuất số tiền hoàn từ email cashback
+- Lưu vào Google Sheet (Cột I cho sao kê, cột N cho hoàn tiền)
 - **Nhắc thanh toán**: trước 3 ngày và 1 ngày qua Telegram + Google Calendar
 
 ### 📊 Báo cáo & Phân tích
@@ -61,7 +62,8 @@ Mỗi tháng có 1 sheet riêng (format: `MM-YYYY`, ví dụ `05-2026`):
 - **Cột A-F**: Bảng giao dịch chính (Ngày, Loại, Danh mục, Số tiền, Mô tả, Ghi chú) — có freeze row 1 + filter
 - **Cột G-H**: Tổng thu nhập / chi tiêu (tự động tính)
 - **Cột J-L (row 1-11)**: Dữ liệu biểu đồ (tự động)
-- **Cột J-M (row 25+)**: Sao kê thẻ tín dụng
+- **Cột I-L (row 25+)**: Sao kê thẻ tín dụng
+- **Cột N-P (row 25+)**: Sao kê hoàn tiền
 - **Cột Q-T**: Bảng giao dịch thẻ tín dụng gộp chung (Tên thẻ | Ngày giờ | Số tiền | Ghi chú) — có filter theo tên thẻ
 
 ---

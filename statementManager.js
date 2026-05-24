@@ -8,7 +8,7 @@
 var STATEMENT_TITLE_ROW = 25;       // Row chứa tiêu đề "📋 Sao kê thẻ tín dụng"
 var STATEMENT_HEADER_ROW = 26;      // Row chứa header cột
 var STATEMENT_DATA_START_ROW = 27;   // Row bắt đầu data
-var STATEMENT_START_COL = 10;        // Cột J
+var STATEMENT_START_COL = 9;         // Cột I
 var STATEMENT_DUES_KEY = "statementDueDates";
 
 // ============================================================
@@ -292,7 +292,7 @@ function processStatements(statements) {
     }
 
     // Gửi tin nhắn Telegram tổng hợp sao kê
-    var msg = "💳 *Sao kê thẻ tín dụng*\n";
+    var msg = "💳 *SAO KÊ THẺ TÍN DỤNG*\n";
 
     for (var j = 0; j < statements.length; j++) {
         var s = statements[j];

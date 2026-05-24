@@ -14,7 +14,7 @@ Tài liệu mô tả tính năng hiện tại và hướng phát triển. Dùng 
 - [x] Sửa giao dịch gần nhất (`/suaphanloai`, `/suadinhdang`, `/suanoidung`)
 
 ### Email Processing — Quét email ngân hàng
-- [x] Kiến trúc 3 luồng modular (credit card tx, transfer tx, statement)
+- [x] Kiến trúc 4 luồng modular (credit card tx, transfer tx, statement, cashback)
 - [x] Router + per-card/bank parser pattern
 - [x] BANK_CONFIG tập trung: mỗi card/bank entry chứa đủ name, parser, sender, subjectKeyword
 - [x] Quét thủ công `/scanmail` + daily trigger tự động
@@ -30,6 +30,7 @@ Tài liệu mô tả tính năng hiện tại và hướng phát triển. Dùng 
 - [x] **CAKE** thẻ tín dụng
 - [x] **VCB** chuyển khoản
 - [x] **MSB, VPBank, UOB, HSBC, CAKE** sao kê
+- [x] **MSB, VPBank** sao kê hoàn tiền (cashback)
 
 ### Statement & Reminders
 - [x] Parse sao kê: dư nợ, hạn thanh toán, kỳ sao kê
@@ -70,7 +71,6 @@ Tài liệu mô tả tính năng hiện tại và hướng phát triển. Dùng 
 ## Tính năng tiềm năng 🔮
 
 ### Email Processing
-- [ ] **Luồng hoàn tiền (cashback/refund)**: quét email thông báo hoàn tiền từ thẻ tín dụng, tự động ghi vào sheet dạng Thu nhập
 - [ ] Thêm ngân hàng mới (Techcombank, BIDV, ...)
 - [ ] Thêm loại email mới (QR pay, ví điện tử, ...)
 - [ ] Quét email khoảng thời gian tùy chọn (không chỉ hôm nay)

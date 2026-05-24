@@ -144,6 +144,46 @@ var BANK_CONFIG = {
             // Thẻ mới có số thẻ trong body → dùng key = last4.
             // Thẻ không có số thẻ trong body → dùng key nội bộ + cardTypeKeyword (xem VPBank).
         }
+    },
+
+    // ── Luồng 4: Sao kê hoàn tiền (Cashback) ─────────────────────────
+    cashback: {
+        cards: {
+            // ── MSB ──
+            "0487": {
+                name: "MSB MDIGI 0487",
+                bank: "MSB",
+                parser: "parseMSBCashback",
+                sender: "cardservicedesk@msb.com.vn",
+                subjectKeyword: "HOÀN TIỀN",
+                cardTypeKeyword: "mDigi"
+            },
+            "0204": {
+                name: "MSB VISA ONLINE 0204",
+                bank: "MSB",
+                parser: "parseMSBCashback",
+                sender: "cardservicedesk@msb.com.vn",
+                subjectKeyword: "HOÀN TIỀN",
+                cardTypeKeyword: "Visa Online"
+            },
+            // ── VPBank ──
+            "VPBANK_STEPUP": {
+                name: "VPBank StepUp 6458",
+                bank: "VPBANK",
+                parser: "parseVPBankCashback",
+                sender: "i2bservices@vpb.com.vn",
+                subjectKeyword: "hoàn tiền",
+                cardTypeKeyword: "MC StepUp Credit"
+            },
+            "VPBANK_WORLD": {
+                name: "VPBank World 3605",
+                bank: "VPBANK",
+                parser: "parseVPBankCashback",
+                sender: "i2bservices@vpb.com.vn",
+                subjectKeyword: "hoàn tiền",
+                cardTypeKeyword: "MC World Credit"
+            }
+        }
     }
 };
 
