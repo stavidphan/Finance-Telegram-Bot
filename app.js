@@ -2738,7 +2738,7 @@ function sendMessage(text, options = { parse_mode: null }) {
       if (options.parse_mode && (responseText.includes("parse") || responseText.includes("entities") || responseText.includes("Bad Request"))) {
         var fallbackPayload = { 
           "chat_id": TELEGRAM_CHAT_ID, 
-          "text": "❌❌❌ *Có lỗi định dạng tin nhắn.* ❌❌❌",
+          "text": "❌ *Có lỗi định dạng tin nhắn.* ❌",
           "parse_mode": "Markdown"
         };
         var fallbackOptions = {

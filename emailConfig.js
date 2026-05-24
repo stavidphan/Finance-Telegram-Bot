@@ -23,14 +23,14 @@ var BANK_CONFIG = {
                 bank: "MSB",
                 parser: "parseMSBCreditCardTx",
                 sender: "banking_notify@msb.com.vn",
-                subjectKeyword: "Biến động chi tiêu thẻ tín dụng"
+                subjectKeyword: "Biến động"
             },
             "0204": {
                 name: "MSB VISA ONLINE 0204",
                 bank: "MSB",
                 parser: "parseMSBCreditCardTx",
                 sender: "banking_notify@msb.com.vn",
-                subjectKeyword: "Biến động chi tiêu thẻ tín dụng"
+                subjectKeyword: "Biến động"
             },
             "6458": {
                 name: "VPBank StepUp 6458",
@@ -185,4 +185,3 @@ function getStreamFilters(streamName) {
 
     return filters;
 }
-

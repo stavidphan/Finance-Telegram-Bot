@@ -54,10 +54,10 @@ function ensureStatementHeaders(sheet) {
  */
 function saveStatementToSheet(statementData) {
     try {
-        // Xác định sheet theo due date month
-        var dueParts = statementData.dueDate.split("/");
-        var dueMonth = parseInt(dueParts[1], 10);
-        var dueYear = parseInt(dueParts[2], 10);
+        // Xác định sheet theo tháng hiện tại quét email (GMT+7)
+        var now = new Date();
+        var dueMonth = parseInt(Utilities.formatDate(now, "GMT+7", "MM"), 10);
+        var dueYear = parseInt(Utilities.formatDate(now, "GMT+7", "yyyy"), 10);
 
         var sheet = getSheetByMonth(dueMonth, dueYear);
         if (!sheet) {

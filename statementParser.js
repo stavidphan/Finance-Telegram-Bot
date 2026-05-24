@@ -114,19 +114,19 @@ function extractStatementCardLast4(rawBody) {
 // ============================================================
 function parseMSBStatement(rawBody, cardKey) {
     // Kỳ sao kê
-    var periodMatch = rawBody.match(/(?:Kì sao kê|Statement Period)[:\s]*\n?\s*([\d\/]+\s*-\s*[\d\/]+)/i);
+    var periodMatch = rawBody.match(/(?:Kì sao kê|Statement Period)[:\s\/]*([\d\/]+\s*-\s*[\d\/]+)/i);
     var statementPeriod = periodMatch ? periodMatch[1].trim() : null;
 
     // Dư nợ
-    var balanceMatch = rawBody.match(/(?:Dư nợ hiện tại|Outstanding balance)[:\s]*\n?\s*([\d,]+)/i);
+    var balanceMatch = rawBody.match(/(?:Dư nợ hiện tại|Outstanding balance)[:\s\/]*([-]?[\d,]+)/i);
     var outstandingBalance = balanceMatch ? parseFloat(balanceMatch[1].replace(/,/g, "")) : null;
 
     // Thanh toán tối thiểu
-    var minDueMatch = rawBody.match(/(?:Số tiền thanh toán tối thiểu|Minimum amount due)[:\s]*\n?\s*([\d,]+)/i);
+    var minDueMatch = rawBody.match(/(?:Số tiền thanh toán tối thiểu|Minimum amount due)[:\s\/]*([-]?[\d,]+)/i);
     var minimumDue = minDueMatch ? parseFloat(minDueMatch[1].replace(/,/g, "")) : null;
 
     // Hạn thanh toán
-    var dueDateMatch = rawBody.match(/(?:Hạn thanh toán|Due date)[:\s]*\n?\s*(\d{2}\/\d{2}\/\d{4})/i);
+    var dueDateMatch = rawBody.match(/(?:Hạn thanh toán|Due date)[:\s\/]*(\d{2}\/\d{2}\/\d{4})/i);
     var dueDate = dueDateMatch ? dueDateMatch[1].trim() : null;
 
     Logger.log("✅ [StatementParser] MSB → card: *" + cardKey +
@@ -135,7 +135,7 @@ function parseMSBStatement(rawBody, cardKey) {
         ", minDue: " + minimumDue +
         ", dueDate: " + dueDate);
 
-    if (!outstandingBalance || !dueDate) {
+    if (outstandingBalance === null || outstandingBalance === undefined || !dueDate) {
         Logger.log("⚠️ [StatementParser] Thiếu dữ liệu sao kê MSB.");
         return null;
     }
@@ -188,7 +188,7 @@ function parseVPBankStatement(rawBody, cardKey) {
         ", minDue: " + minimumDue +
         ", dueDate: " + dueDate);
 
-    if (!outstandingBalance || !dueDate) {
+    if (outstandingBalance === null || outstandingBalance === undefined || !dueDate) {
         Logger.log("⚠️ [StatementParser] Thiếu dữ liệu sao kê VPBank.");
         return null;
     }
@@ -241,7 +241,7 @@ function parseUOBStatement(rawBody, cardKey) {
         ", minDue: " + minimumDue +
         ", dueDate: " + dueDate);
 
-    if (!outstandingBalance || !dueDate) {
+    if (outstandingBalance === null || outstandingBalance === undefined || !dueDate) {
         Logger.log("⚠️ [StatementParser] Thiếu dữ liệu sao kê UOB.");
         return null;
     }
@@ -297,7 +297,7 @@ function parseHSBCStatement(rawBody, cardKey) {
         ", minDue: " + minimumDue +
         ", dueDate: " + dueDate);
 
-    if (!outstandingBalance || !dueDate) {
+    if (outstandingBalance === null || outstandingBalance === undefined || !dueDate) {
         Logger.log("⚠️ [StatementParser] Thiếu dữ liệu sao kê HSBC.");
         return null;
     }

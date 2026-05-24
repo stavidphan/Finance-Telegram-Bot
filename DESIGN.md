@@ -218,7 +218,7 @@ Chart: Pie chart vị trí J4, kích thước 500x400px.
 | 26 | Tên thẻ | Dư nợ | Hạn thanh toán | Kỳ sao kê |
 | 27+ | MSB VISA ONLINE 0204 | 3,417,058 | 10/05/2026 | 30/03 - 25/04/2026 |
 
-- Sheet xác định bởi due date month
+- Sheet xác định bởi tháng hiện tại quét email
 - Nếu cùng thẻ đã có → update row cũ (không tạo mới)
 
 > **⚠️ QUAN TRỌNG**: Khi insert vào bảng chính (A-F), luôn dùng `getLastMainTableRow(sheet)` thay vì `sheet.getLastRow()` để tránh insert vào khu vực sao kê hoặc chart.

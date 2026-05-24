@@ -203,7 +203,8 @@ function confirmAndSaveEmailTransactions(bulkNote) {
                         cardLast4: tx.last4,
                         transactionTime: tx.transactionTime,
                         amount: amount,
-                        note: noteForCardLedger
+                        note: noteForCardLedger,
+                        type: type
                     });
                 }
 

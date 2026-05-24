@@ -201,6 +201,12 @@ function scanEmailStream(streamName, filters, parserFn, startOfDay, resultArray,
 
                 if (!parsed) {
                     Logger.log("⚠️ [" + streamName + "] Không parse được email: " + emailId);
+                    logErrorToSheet(
+                        "Email Parse Error",
+                        "Không parse được email " + streamName,
+                        "scanEmailStream",
+                        { emailId: emailId, subject: msg.getSubject() }
+                    );
                     continue;
                 }
 

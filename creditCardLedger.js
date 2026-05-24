@@ -87,7 +87,7 @@ function getNextRowInCreditCardLedger(sheet) {
  * @param {number} amount        - Số tiền
  * @param {string} note          - Ghi chú (không có "- thẻ XXX")
  */
-function saveCreditCardSubLedger(sheet, cardLast4, transactionTime, amount, note) {
+function saveCreditCardSubLedger(sheet, cardLast4, transactionTime, amount, note, type) {
     try {
         ensureCreditCardLedgerHeaders(sheet);
 
@@ -96,7 +96,14 @@ function saveCreditCardSubLedger(sheet, cardLast4, transactionTime, amount, note
 
         sheet.getRange(nextRow, LEDGER_START_COL, 1, LEDGER_COL_COUNT)
             .setValues([[cardName, transactionTime, amount, note]]);
-        sheet.getRange(nextRow, LEDGER_START_COL + 2).setNumberFormat("#,##0");
+        
+        var amountCell = sheet.getRange(nextRow, LEDGER_START_COL + 2);
+        amountCell.setNumberFormat("#,##0");
+        if (type === "Thu nhập") {
+            amountCell.setFontColor("#37d462").setFontWeight("bold");
+        } else {
+            amountCell.setFontColor("#000000").setFontWeight("normal");
+        }
 
         Logger.log("✅ [CreditCardLedger] Đã ghi: " + cardName + " tại row " + nextRow);
     } catch (e) {
@@ -107,7 +114,7 @@ function saveCreditCardSubLedger(sheet, cardLast4, transactionTime, amount, note
 /**
  * Ghi nhiều giao dịch thẻ tín dụng vào bảng gộp trong 1 lần gọi API (batch mode)
  * @param {Sheet} sheet
- * @param {Array} entries - [{ cardLast4, transactionTime, amount, note }]
+ * @param {Array} entries - [{ cardLast4, transactionTime, amount, note, type }]
  */
 function saveCreditCardSubLedgerBatch(sheet, entries) {
     if (!entries || entries.length === 0) return;
@@ -121,8 +128,24 @@ function saveCreditCardSubLedgerBatch(sheet, entries) {
 
         sheet.getRange(nextRow, LEDGER_START_COL, rowData.length, LEDGER_COL_COUNT)
             .setValues(rowData);
-        sheet.getRange(nextRow, LEDGER_START_COL + 2, rowData.length, 1)
-            .setNumberFormat("#,##0");
+        
+        var amountRange = sheet.getRange(nextRow, LEDGER_START_COL + 2, rowData.length, 1);
+        amountRange.setNumberFormat("#,##0");
+
+        var fontColors = [];
+        var fontWeights = [];
+        for (var i = 0; i < entries.length; i++) {
+            var type = entries[i].type;
+            if (type === "Thu nhập") {
+                fontColors.push(["#37d462"]); // Xanh lá
+                fontWeights.push(["bold"]);
+            } else {
+                fontColors.push(["#000000"]); // Đen
+                fontWeights.push(["normal"]);
+            }
+        }
+        amountRange.setFontColors(fontColors);
+        amountRange.setFontWeights(fontWeights);
 
         Logger.log("✅ [CreditCardLedger] Đã batch ghi " + rowData.length + " dòng từ row " + nextRow);
     } catch (e) {
