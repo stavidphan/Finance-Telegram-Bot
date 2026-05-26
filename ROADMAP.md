@@ -21,6 +21,7 @@ Tài liệu mô tả tính năng hiện tại và hướng phát triển. Dùng 
 - [x] Chống trùng lặp email (processedEmailIds, TTL 7 ngày)
 - [x] Pending transaction flow: quét → user ghi chú → lưu
 - [x] **VCB: parse và hiển thị nội dung chuyển khoản** ("Details of Payment") khi thông báo giao dịch
+- [x] **Thông báo lỗi qua Telegram** khi quét email thất bại (parse error/processing error)
 
 ### Banks & Cards đã hỗ trợ
 - [x] **MSB** thẻ tín dụng: MDIGI 0487, VISA ONLINE 0204

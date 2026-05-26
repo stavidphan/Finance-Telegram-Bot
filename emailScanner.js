@@ -195,42 +195,95 @@ function scanEmailStream(streamName, filters, parserFn, startOfDay, resultArray,
                 //     continue;
                 // }
 
-                // Kiểm tra đã xử lý: dùng in-memory idSet nếu có, fallback sang PropertiesService
-                var alreadyProcessed = processedIdSet
-                    ? (processedIdSet[emailId] === true)
-                    : isEmailProcessed(emailId);
+                try {
+                    // Kiểm tra đã xử lý: dùng in-memory idSet nếu có, fallback sang PropertiesService
+                    var alreadyProcessed = processedIdSet
+                        ? (processedIdSet[emailId] === true)
+                        : isEmailProcessed(emailId);
 
-                if (alreadyProcessed) {
-                    Logger.log("⏭️ [" + streamName + "] Email đã xử lý: " + emailId);
-                    continue;
-                }
+                    if (alreadyProcessed) {
+                        Logger.log("⏭️ [" + streamName + "] Email đã xử lý: " + emailId);
+                        continue;
+                    }
 
-                var body = msg.getPlainBody();
-                var parsed = parserFn(body);
+                    var body = msg.getPlainBody();
+                    var parsed = parserFn(body);
 
-                // Đánh dấu đã xử lý: gom vào newIdsList nếu có, fallback sang ghi ngay
-                if (processedIdSet && newIdsList) {
-                    processedIdSet[emailId] = true; // Cập nhật cache in-memory để tránh trùng trong cùng lần scan
-                    newIdsList.push(emailId);
-                } else {
-                    markEmailProcessed(emailId);
-                }
+                    // Đánh dấu đã xử lý: gom vào newIdsList nếu có, fallback sang ghi ngay
+                    if (processedIdSet && newIdsList) {
+                        processedIdSet[emailId] = true; // Cập nhật cache in-memory để tránh trùng trong cùng lần scan
+                        newIdsList.push(emailId);
+                    } else {
+                        markEmailProcessed(emailId);
+                    }
 
-                if (!parsed) {
-                    Logger.log("⚠️ [" + streamName + "] Không parse được email: " + emailId);
+                    if (!parsed) {
+                        Logger.log("⚠️ [" + streamName + "] Không parse được email: " + emailId);
+                        logErrorToSheet(
+                            "Email Parse Error",
+                            "Không parse được email " + streamName,
+                            "scanEmailStream",
+                            { emailId: emailId, subject: msg.getSubject() }
+                        );
+
+                        // Gửi thông báo lỗi cho người dùng qua Telegram
+                        var streamNameVi = getStreamDisplayName(streamName);
+                        var userErrorMsg = "⚠️ *Lỗi xử lý email giao dịch/sao kê*\n\n" +
+                            "Hệ thống không thể phân tích nội dung email sau:\n" +
+                            "• *Loại:* " + streamNameVi + "\n" +
+                            "• *Người gửi:* `" + cfg.sender + "`\n" +
+                            "• *Tiêu đề:* " + escapeMarkdown(msg.getSubject()) + "\n" +
+                            "• *Thời gian:* `" + Utilities.formatDate(msg.getDate(), "GMT+7", "dd/MM/yyyy HH:mm") + "`\n\n" +
+                            "Lỗi đã được ghi lại trong sheet *System Logs*. Bạn hãy kiểm tra lại hoặc nhập thủ công giao dịch này.";
+                        sendMessage(userErrorMsg, { parse_mode: "Markdown" });
+                        continue;
+                    }
+
+                    resultArray.push(parsed);
+                    Logger.log("✅ [" + streamName + "] Đã parse email: " + emailId);
+                } catch (err) {
+                    Logger.log("❌ [" + streamName + "] Lỗi xử lý email " + emailId + ": " + err.message);
                     logErrorToSheet(
-                        "Email Parse Error",
-                        "Không parse được email " + streamName,
+                        "Email Processing Error",
+                        err.message,
                         "scanEmailStream",
                         { emailId: emailId, subject: msg.getSubject() }
                     );
-                    continue;
-                }
 
-                resultArray.push(parsed);
-                Logger.log("✅ [" + streamName + "] Đã parse email: " + emailId);
+                    // Đánh dấu đã xử lý để tránh quét lại nhiều lần gây spam
+                    if (processedIdSet && newIdsList) {
+                        processedIdSet[emailId] = true;
+                        newIdsList.push(emailId);
+                    } else {
+                        markEmailProcessed(emailId);
+                    }
+
+                    var streamNameVi = getStreamDisplayName(streamName);
+                    var userErrorMsg = "⚠️ *Lỗi xử lý email giao dịch/sao kê*\n\n" +
+                        "Hệ thống gặp sự cố khi xử lý email sau:\n" +
+                        "• *Loại:* " + streamNameVi + "\n" +
+                        "• *Người gửi:* `" + cfg.sender + "`\n" +
+                        "• *Tiêu đề:* " + escapeMarkdown(msg.getSubject()) + "\n" +
+                        "• *Thời gian:* `" + Utilities.formatDate(msg.getDate(), "GMT+7", "dd/MM/yyyy HH:mm") + "`\n" +
+                        "• *Lỗi:* " + escapeMarkdown(err.message) + "\n\n" +
+                        "Chi tiết lỗi đã được ghi lại trong sheet *System Logs*. Bạn hãy kiểm tra lại hoặc nhập thủ công.";
+                    sendMessage(userErrorMsg, { parse_mode: "Markdown" });
+                }
             }
         }
+    }
+}
+
+/**
+ * Lấy tên hiển thị tiếng Việt của luồng email để thông báo cho người dùng
+ */
+function getStreamDisplayName(streamName) {
+    switch (streamName) {
+        case "creditCardTx": return "Giao dịch thẻ tín dụng";
+        case "transferTx": return "Giao dịch chuyển khoản";
+        case "statement": return "Sao kê thẻ tín dụng";
+        case "cashback": return "Sao kê hoàn tiền (cashback)";
+        default: return streamName;
     }
 }
 

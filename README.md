@@ -80,6 +80,8 @@ Mỗi tháng có 1 sheet riêng (format: `MM-YYYY`, ví dụ `05-2026`):
    - Nhập `-` nếu không có ghi chú
 5. Bot xác nhận và lưu vào Sheet
 
+*Lưu ý:* Nếu có email bị lỗi hoặc không thể phân tích (ví dụ format email ngân hàng thay đổi), bot sẽ gửi thông báo lỗi chi tiết qua Telegram để bạn biết và tự nhập thủ công.
+
 ---
 
 ## Cấu hình hệ thống
